@@ -13,7 +13,7 @@ class EvaluationController extends Controller
      */
     public function index()
     {
-        $evaluations = Evaluation::where('user_id', auth()->id())->get();
+        $evaluations = Evaluation::all(); // Récupérer toutes les évaluations sans filtrer par user_id
         return view('evaluations.index', compact('evaluations'));
     }
 
@@ -22,7 +22,7 @@ class EvaluationController extends Controller
      */
     public function create()
     {
-        $etudiants = Etudiant::where('user_id', auth()->id())->get();
+        $etudiants = Etudiant::all(); // Récupérer tous les étudiants
         return view('evaluations.create', compact('etudiants'));
     }
 
@@ -35,13 +35,12 @@ class EvaluationController extends Controller
             'title' => 'required|string|max:255',
             'type' => 'required|in:exam,homework',
             'date' => 'required|date',
+            'user_id' => 'required|exists:users,id', // L'utilisateur doit être sélectionné manuellement
             'etudiants' => 'nullable|array',
             'etudiants.*' => 'exists:etudiants,id',
         ]);
 
-        $evaluation = new Evaluation($request->all());
-        $evaluation->user_id = auth()->id();
-        $evaluation->save();
+        $evaluation = Evaluation::create($request->all());
 
         // Attacher les étudiants sélectionnés à l'évaluation
         if ($request->has('etudiants')) {
@@ -57,11 +56,6 @@ class EvaluationController extends Controller
      */
     public function show(Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         return view('evaluations.show', compact('evaluation'));
     }
 
@@ -70,12 +64,7 @@ class EvaluationController extends Controller
      */
     public function edit(Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $etudiants = Etudiant::where('user_id', auth()->id())->get();
+        $etudiants = Etudiant::all(); // Récupérer tous les étudiants
         $selectedEtudiants = $evaluation->etudiants->pluck('id')->toArray();
 
         return view('evaluations.edit', compact('evaluation', 'etudiants', 'selectedEtudiants'));
@@ -86,15 +75,11 @@ class EvaluationController extends Controller
      */
     public function update(Request $request, Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:exam,homework',
             'date' => 'required|date',
+            'user_id' => 'required|exists:users,id', // L'utilisateur doit être sélectionné manuellement
             'etudiants' => 'nullable|array',
             'etudiants.*' => 'exists:etudiants,id',
         ]);
@@ -117,11 +102,6 @@ class EvaluationController extends Controller
      */
     public function destroy(Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $evaluation->delete();
 
         return redirect()->route('evaluations.index')
@@ -133,11 +113,6 @@ class EvaluationController extends Controller
      */
     public function grade(Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         return view('evaluations.grade', compact('evaluation'));
     }
 
@@ -146,11 +121,6 @@ class EvaluationController extends Controller
      */
     public function updateGrades(Request $request, Evaluation $evaluation)
     {
-        // Vérifier que l'évaluation appartient à l'enseignant connecté
-        if ($evaluation->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
             'notes' => 'required|array',
             'notes.*' => 'nullable|numeric|min:0|max:20',

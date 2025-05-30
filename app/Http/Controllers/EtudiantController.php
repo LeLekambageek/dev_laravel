@@ -12,7 +12,7 @@ class EtudiantController extends Controller
      */
     public function index()
     {
-        $etudiants = Etudiant::where('user_id', auth()->id())->get();
+        $etudiants = Etudiant::all(); // Récupérer tous les étudiants sans filtrer par user_id
         return view('etudiants.index', compact('etudiants'));
     }
 
@@ -30,14 +30,13 @@ class EtudiantController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'student_id' => 'nullable|string|max:255|unique:etudiants',
+            'user_id' => 'required|exists:users,id', // L'utilisateur doit être sélectionné manuellement
         ]);
 
-        $etudiant = new Etudiant($request->all());
-        $etudiant->user_id = auth()->id();
-        $etudiant->save();
+        Etudiant::create($request->all());
 
         return redirect()->route('etudiants.index')
             ->with('success', 'Étudiant ajouté avec succès.');
@@ -48,11 +47,6 @@ class EtudiantController extends Controller
      */
     public function show(Etudiant $etudiant)
     {
-        // Vérifier que l'étudiant appartient à l'enseignant connecté
-        if ($etudiant->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         return view('etudiants.show', compact('etudiant'));
     }
 
@@ -61,11 +55,6 @@ class EtudiantController extends Controller
      */
     public function edit(Etudiant $etudiant)
     {
-        // Vérifier que l'étudiant appartient à l'enseignant connecté
-        if ($etudiant->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         return view('etudiants.edit', compact('etudiant'));
     }
 
@@ -74,15 +63,11 @@ class EtudiantController extends Controller
      */
     public function update(Request $request, Etudiant $etudiant)
     {
-        // Vérifier que l'étudiant appartient à l'enseignant connecté
-        if ($etudiant->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'etudiants_id' => 'nullable|string|max:255|unique:etudiants,student_id,' . $etudiant->id,
+            'etudiant_id' => 'nullable|string|max:255|unique:etudiants,etudiant_id,' . $etudiant->id,
+            'user_id' => 'required|exists:users,id', // L'utilisateur doit être sélectionné manuellement
         ]);
 
         $etudiant->update($request->all());
@@ -96,11 +81,6 @@ class EtudiantController extends Controller
      */
     public function destroy(Etudiant $etudiant)
     {
-        // Vérifier que l'étudiant appartient à l'enseignant connecté
-        if ($etudiant->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $etudiant->delete();
 
         return redirect()->route('etudiants.index')

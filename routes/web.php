@@ -9,5 +9,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//Routeq pour les etudiants et les evaluations
+Route::ressource('etudiant', EtudiantController::class);
+Route::ressource('evaluation', EvaluationController::class);
 
-Route::middle
+//routes supplementaires pour les notes
+Route::get('/evaluations/{evaluation}/grade',[EvaluationController::class, 'grade'])->name('evaluation.grade');
+Route::post('/evaluations/{evaluation}/update-grades', [EvaluationController::class, 'updateGrades'])->name('evaluations.update-grades');
