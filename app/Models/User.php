@@ -18,7 +18,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
         'password',
         'role',
     ];
@@ -36,12 +35,6 @@ class User extends Authenticatable
     /**
      * The attributes that should be cast.
      *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
     
     /**
      * Get the students associated with the teacher.
@@ -64,6 +57,6 @@ class User extends Authenticatable
      */
     public function isTeacher()
     {
-        return $this->role === 'teacher';
+        return $this->role === 'enseignant';
     }
 }

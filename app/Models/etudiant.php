@@ -15,9 +15,8 @@ class Etudiant extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
+        'nom',
+        'prenom',
         'student_id',
         'user_id',
     ];
@@ -45,6 +44,6 @@ class Etudiant extends Model
      */
     public function getFullNameAttribute()
     {
-        return "{$this->first_name} {$this->last_name}";
+        return "{$this->nom} {$this->prenom}";
     }
 }
