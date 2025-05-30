@@ -34,7 +34,7 @@ class Etudiant extends Model
      */
     public function evaluations()
     {
-        return $this->belongsToMany(Evaluation::class, 'etudiant_evaluation')
+        return $this->belongsToMany(Evaluation::class, 'etudiants_evaluations')
                     ->withPivot('note', 'is_submitted')
                     ->withTimestamps();
     }
