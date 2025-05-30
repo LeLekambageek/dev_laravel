@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('evaluation', function (Blueprint $table) {
+        Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
+            $table->string('titre');
+            $table->date('date');
+            $table->enum('type', ['examen ou devoir']);
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }
