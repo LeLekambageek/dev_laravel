@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('etudiants_evaluations', function (Blueprint $table) {
+        Schema::create('etudiant_evaluation', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('etudiant_id')->constrained;
-            $table->foreignId('evaluation_id')->constrained;
-            $table->float('note'); 
+            $table->foreignId('etudiant_id')->constrained()->onDelete('cascade');
+            $table->foreignId('evaluation_id')->constrained()->onDelete('cascade');
+            $table->decimal('note', 5, 2)->nullable(); // note sur l'évaluation
             $table->timestamps();
-            //$table->foreign('etudiant_id')->references('id')->on('etudiants')->onDelete('cascade');
-            //$table->foreign('evaluation_id')->references('id')->on('evaluations')->onDelete('cascade');
+            
+            // Un étudiant ne peut avoir qu'une seule entrée pour une évaluation donnée
+            $table->unique(['etudiant_id', 'evaluation_id']);
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('etudiants_evaluations');
+        Schema::dropIfExists('etudiant_evaluation');
     }
 };

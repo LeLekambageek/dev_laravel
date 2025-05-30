@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
-            $table->string('titre');
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->enum('type', ['exam', 'homework']); // examen ou devoir
             $table->date('date');
-            $table->enum('type', ['examen ou devoir']);
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // l'enseignant qui a créé l'évaluation
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('evaluation');
+        Schema::dropIfExists('evaluations');
     }
 };
